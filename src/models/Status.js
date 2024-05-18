@@ -4,7 +4,9 @@ const prisma = new PrismaClient()
 const Status = {
     getAll: async () => {
         try {
-            const response = await prisma.status.findMany()
+            const response = await prisma.status.findMany({
+                take: 4
+            })
 
             return response
         } catch (error) {

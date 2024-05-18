@@ -1,10 +1,14 @@
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const Presensi = {
     getAll: async () => {
         try {
-            const response = await prisma.presensi.findMany()
+            const response = await prisma.$queryRaw`
+                SELECT User.nip, User.nama, Presensi.tanggal, Presensi.jamMasuk, Presensi.jamKeluar, Status.nama_status FROM Presensi
+                LEFT JOIN User ON Presensi.userId = User.nip
+                LEFT JOIN Status ON Presensi.statusId = Status.id
+            `
 
             return response
         } catch (error) {
@@ -26,15 +30,17 @@ const Presensi = {
         }
     },
 
-    presensiMasuk: async (nip, latitude, longitude, tanggal, jam_msk) => {
+    presensiMasuk: async (nip, data) => {
         try {
+            
             const response = await prisma.presensi.create({
                 data: {
-                    user: { connect: { nip: nip }},
-                    latitude: latitude,
-                    longitude: longitude,
-                    tanggal: tanggal,
-                    jamMasuk: jam_msk,
+                    ...data,
+                    user: { 
+                        connect: { 
+                            nip: nip
+                        }
+                    },
                     status: {
                         connect: {
                             id: 1

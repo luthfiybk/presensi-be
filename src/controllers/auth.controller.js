@@ -16,7 +16,8 @@ const AuthController = {
             if(identifier.includes('@')) {
                 user = await User.getByEmail(identifier)
             } else {
-                user = await User.getByNIP(identifier)
+                const data = await User.getByNIP(identifier)
+                user = data[0]
             }
 
             if (!user) {
@@ -46,7 +47,7 @@ const AuthController = {
                 activity: 'Login'
             })
     
-            res.status(200).json({ token: token, nip: user.nip, roleId: user.roleId })
+            res.status(200).json({ token: token, nip: user.nip, roleId: user.roleId})
             next()
         } catch (error) {
             res.status(500).json({ message: error.message })

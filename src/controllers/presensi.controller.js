@@ -1,5 +1,6 @@
 const Presensi = require('../models/Presensi')
 const jwt = require('jsonwebtoken')
+const { formatISO } = require('date-fns/formatISO')
 
 const PresensiController = {
     getAll: async (req, res) => {
@@ -41,10 +42,15 @@ const PresensiController = {
             const nip = decodedToken.nip
             const latitude = req.body.latitude
             const longitude = req.body.longitude
-            const tanggal = new Date().toISOString()
-            const jam_msk = new Date().toISOString()
 
-            const response = await Presensi.presensiMasuk(nip, latitude, longitude, tanggal, jam_msk)
+            const data = {
+                latitude: latitude,
+                longitude: longitude,
+                tanggal: formatISO(new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }), { representation: 'basic' }),
+                jamMasuk: formatISO(new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }), { representation: 'basic' })
+            }
+
+            const response = await Presensi.presensiMasuk(nip, data)
 
             return res.status(201).json(response)
         } catch (error) {

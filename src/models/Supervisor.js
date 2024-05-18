@@ -33,7 +33,7 @@ const Supervisor = {
     getIzin: async (divisiId) => {
         try {
             const response = await prisma.$queryRaw`
-                SELECT User.nip, User.nama, Izin.keterangan, Status.nama_status, Izin.tanggal FROM Izin
+                SELECT Izin.id, User.nip, User.nama, Izin.statusId, Izin.keterangan, Status.nama_status, Izin.tanggal FROM Izin
                 LEFT JOIN User ON User.nip = Izin.userId
                 LEFT JOIN Status ON Status.id = Izin.statusId
                 WHERE User.divisiId = ${divisiId}

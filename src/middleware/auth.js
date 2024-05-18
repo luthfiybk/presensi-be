@@ -15,7 +15,7 @@ const auth = async (req, res, next) => {
         }
         
         res.set("Authorization",  "Bearer " + token);
-        res.status(200).json({ message: "Authorized", nip: decodedToken.nip });
+        res.status(200).json({ message: "Authorized" });
         // next();
 
         return decodedToken

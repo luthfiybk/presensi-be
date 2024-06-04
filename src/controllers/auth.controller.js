@@ -1,3 +1,4 @@
+const { formatISO } = require('date-fns')
 const LogActivity = require('../models/LogActivity')
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')
@@ -44,10 +45,11 @@ const AuthController = {
 
             LogActivity.login({
                 userId: user.nip,
-                activity: 'Login'
+                activity: 'Login',
+                time: formatISO(new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta'}), {representation: 'complete'})
             })
     
-            res.status(200).json({ token: token, nip: user.nip, roleId: user.roleId})
+            res.status(200).json({ token: token, nip: user.nip, roleId: user.roleId, nama: user.nama })
             next()
         } catch (error) {
             res.status(500).json({ message: error.message })
@@ -70,7 +72,8 @@ const AuthController = {
         try {
             LogActivity.logout({
                 userId: decodedToken.nip,
-                activity: 'Logout'
+                activity: 'Logout',
+                time: formatISO(new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta'}), {representation: 'complete'})
             })
 
             req.session.destroy()

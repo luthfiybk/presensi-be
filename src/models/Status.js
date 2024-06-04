@@ -4,8 +4,23 @@ const prisma = new PrismaClient()
 const Status = {
     getAll: async () => {
         try {
-            const response = await prisma.status.findMany({
-                take: 4
+            const response = await prisma.status.findMany()
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    update: async (id, data) => {
+        try {
+            const response = await prisma.status.update({
+                where: {
+                    id: parseInt(id)
+                },
+                data: {
+                    ...data
+                }
             })
 
             return response

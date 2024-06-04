@@ -1,10 +1,11 @@
 const { PrismaClient } = require('@prisma/client')
+const { update } = require('./User')
 const prisma = new PrismaClient()
 
-const Divisi = {
+const Titik = {
     getAll: async () => {
         try {
-            const response = await prisma.divisi.findMany()
+            const response = await prisma.titik.findMany()
 
             return response
         } catch (error) {
@@ -12,34 +13,39 @@ const Divisi = {
         }
     },
 
-    create: async (nama_divisi) => {
+    add: async (data) => {
         try {
-            const response = await prisma.divisi.create({
+            const response = await prisma.titik.create({
                 data: {
-                    nama_divisi: nama_divisi
+                    ...data
                 }
             })
-            
+
             return response
         } catch (error) {
             throw new Error(error.message)
         }
     },
 
-    update: async (id, nama_divisi) => {
+    update: async (id, nama_titik, latitude, longitude, radius) => {
         try {
-            const response = await prisma.divisi.update({
+            const response = await prisma.titik.update({
                 where: {
                     id: parseInt(id)
                 },
                 data: {
-                    nama_divisi: nama_divisi
+                    nama_titik: nama_titik,
+                    latitude: parseFloat(latitude),
+                    longitude: parseFloat(longitude),
+                    radius: parseInt(radius)
                 }
             })
+
+            return response
         } catch (error) {
             throw new Error(error.message)
         }
     }
 }
 
-module.exports = Divisi
+module.exports = Titik

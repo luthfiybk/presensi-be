@@ -10,6 +10,23 @@ const Role = {
         } catch (error) {
             throw new Error(error.message)
         }
+    },
+
+    update: async (id, data) => {
+        try {
+            const response = await prisma.role.update({
+                where: {
+                    id: parseInt(id)
+                },
+                data: {
+                    ...data
+                }
+            })
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
     }
 }
 

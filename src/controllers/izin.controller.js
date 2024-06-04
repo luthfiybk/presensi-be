@@ -1,4 +1,3 @@
-const { decode } = require('jsonwebtoken')
 const Izin = require('../models/Izin')
 const jwt = require('jsonwebtoken')
 const {formatISO} = require('date-fns/formatISO')
@@ -53,6 +52,8 @@ const IzinController = {
         try {
             const izinId = req.params.id
             const response = await Izin.getById(izinId)
+            const fileUrl = `${process.env.BASE_URL}/api/symlink/file/${response[0].file}`
+            response[0].file_link = fileUrl
 
             return res.status(200).json(response)
         } catch (error) {
@@ -62,6 +63,7 @@ const IzinController = {
 
     approveIzin: async (req, res) => {
         let token = req.headers.authorization;
+        console.log(token)
 
         if (!token || !token.startsWith("Bearer ")) {
             return res.status(401).json({ error: "Unauthorized - Missing Token" });
@@ -74,7 +76,7 @@ const IzinController = {
         }
 
         try {
-            if (decodedToken.roleId === 3 || decodedToken.divisiId === 1) {
+            if (decodedToken.roleId === 3 || decodedToken.roleId === 1) {
                 const izinId = req.params.id
                 const statusId = 5
     
@@ -101,6 +103,7 @@ const IzinController = {
         if (!decodedToken || !decodedToken.nip) {
             return res.status(401).json({ error: "Unauthorized - Invalid Token" });
         }
+
         try {
             if(decodedToken.roleId === 3 || decodedToken.roleId === 1) {
                 const izinId = req.params.id
@@ -116,7 +119,7 @@ const IzinController = {
         } catch (error) {
             return res.status(500).json({ message: error.message })
         }
-    }
+    },
 }
 
 module.exports = IzinController

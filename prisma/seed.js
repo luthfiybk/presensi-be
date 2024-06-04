@@ -68,15 +68,33 @@ async function seeder() {
 
         const hashedPassword = await bcrypt.hash('testing', 10)
 
-        const user = await prisma.user.create({
-            data: {
-                nip: '1234567890',
-                email: 'luthfi@email.com',
-                nama: 'Luthfi',
-                password: hashedPassword,
-                roleId: 2,
-                divisiId: 1
-            }
+        const user = await prisma.user.createMany({
+            data: [
+                {
+                    nip: '1234567890',
+                    email: 'luthfi@email.com',
+                    nama: 'Luthfi',
+                    password: hashedPassword,
+                    roleId: 2,
+                    divisiId: 1
+                },
+                {
+                    nip: '1234567891',
+                    email: 'supervisor@email.com',
+                    nama: 'Supervisor',
+                    password: hashedPassword,
+                    roleId: 3,
+                    divisiId: 1
+                },
+                {
+                    nip: '1234567892',
+                    email: 'admin@email.com',
+                    nama: 'Admin',
+                    password: hashedPassword,
+                    roleId: 1,
+                    divisiId: null
+                }
+            ]
         })
 
         console.log('Seeding success', user, divisi, role, status)

@@ -5,7 +5,7 @@ const User = {
     getAll: async () => {
         try {
             const response = await prisma.$queryRaw`
-                SELECT User.nama, User.nip, Role.nama_role, Divisi.nama_divisi FROM User
+                SELECT User.nama, User.nip, Role.nama_role as 'role', Divisi.nama_divisi as 'divisi', User.email as 'email' FROM User
                 LEFT JOIN Role ON User.roleId = Role.id
                 LEFT JOIN Divisi ON User.divisiId = Divisi.id
             `
@@ -19,7 +19,8 @@ const User = {
     getByNIP: async (userId) => {
         try {
             const response = await prisma.$queryRaw`
-                SELECT User.id, User.nama, User.nip, User.email, User.password, User.roleId, User.divisiId, Role.nama_role, Divisi.nama_divisi FROM User
+                SELECT User.id, User.nama, User.nip, User.email, User.password, User.roleId, User.divisiId, Role.nama_role, Divisi.nama_divisi
+                FROM User
                 LEFT JOIN Role ON User.roleId = Role.id
                 LEFT JOIN Divisi ON User.divisiId = Divisi.id
                 WHERE User.nip = ${userId}

@@ -51,8 +51,7 @@ model Presensi {
   userId    String
   user      User     @relation(fields: [userId], references: [nip])
   tanggal   DateTime  @db.Date
-  jamMasuk  DateTime  @db.Time
-  jamKeluar DateTime? @db.Time
+  jamMasuk  DateTime
   latitude  Float
   longitude Float
   statusId  Int
@@ -74,11 +73,12 @@ model Izin {
   updatedAt   DateTime @updatedAt
 }
 
-model Gedung {
+model Titik {
   id              Int   @id @default(autoincrement())
-  nama_gedung     String
+  nama_titik      String
   latitude        Float
   longitude       Float
+  radius          Int
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -98,6 +98,7 @@ model LogActivity {
   userId    String
   user      User     @relation(fields: [userId], references: [nip])
   activity  String
+  time      DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

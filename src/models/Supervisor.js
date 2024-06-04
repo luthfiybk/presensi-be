@@ -19,9 +19,10 @@ const Supervisor = {
     getKaryawan: async (divisiId) => {
         try {
             const response = prisma.$queryRaw`
-                SELECT User.nip, User.nama, Divisi.nama_divisi FROM User
+                SELECT User.nip, User.nama, Divisi.nama_divisi as 'divisi', User.email FROM User
                 LEFT JOIN Divisi ON User.divisiId = Divisi.id
-                WHERE User.divisiId = ${divisiId}
+                LEFT JOIN Role ON User.roleId = Role.id
+                WHERE User.divisiId = ${divisiId} AND User.roleId = 2
             `
 
             return response
@@ -33,7 +34,7 @@ const Supervisor = {
     getIzin: async (divisiId) => {
         try {
             const response = await prisma.$queryRaw`
-                SELECT Izin.id, User.nip, User.nama, Izin.statusId, Izin.keterangan, Status.nama_status, Izin.tanggal FROM Izin
+                SELECT Izin.id, User.nip, User.nama, Izin.statusId, Izin.keterangan, Status.nama_status as 'status', Izin.tanggal FROM Izin
                 LEFT JOIN User ON User.nip = Izin.userId
                 LEFT JOIN Status ON Status.id = Izin.statusId
                 WHERE User.divisiId = ${divisiId}
@@ -48,8 +49,9 @@ const Supervisor = {
     getPresensi: async (divisiId) => {
         try {
             const response = await prisma.$queryRaw`
-                SELECT User.nip, User.nama, Presensi.tanggal, Presensi.jamMasuk FROM Presensi
+                SELECT Presensi.id, User.nip, User.nama, Presensi.tanggal, Presensi.jamMasuk, Status.nama_status as 'status', Presensi.statusId FROM Presensi
                 LEFT JOIN User ON User.nip = Presensi.userId
+                LEFT JOIN Status ON Status.id = Presensi.statusId
                 WHERE User.divisiId = ${divisiId}
             `
 

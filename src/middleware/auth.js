@@ -16,15 +16,15 @@ const auth = async (req, res, next) => {
         
         res.set("Authorization",  "Bearer " + token);
         res.status(200).json({ message: "Authorized" });
-        // next();
-
-        return decodedToken
+        
+        next();
     } catch (err) {
         if (err.name === "TokenExpiredError") {
             return res.status(401).json({ error: "Unauthorized - Token expired" });
         } else {
             return res.status(500).json({ error: "Internal Server Error" });
         }
+        
     }
 };
 

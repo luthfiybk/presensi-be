@@ -5,7 +5,7 @@ const Izin = {
     getAll: async () => {
         try {
             const response = await prisma.$queryRaw`
-                SELECT Izin.id, User.nip, User.nama, Izin.tanggal, Izin.statusId, Izin.keterangan, Status.nama_status FROM Izin
+                SELECT Izin.id, User.nip, User.nama, Izin.tanggal, Izin.statusId, Izin.keterangan, Status.nama_status as 'status' FROM Izin
                 LEFT JOIN User ON Izin.userId = User.nip
                 LEFT JOIN Status ON Izin.statusId = Status.id
             `
@@ -45,14 +45,14 @@ const Izin = {
         }
     },
 
-    updateIzin: async (data) => {
+    updateIzin: async (id, statusId) => {
         try {
             const response = await prisma.izin.update({
                 where: {
-                    id: data.id
+                    id: id
                 },
                 data: {
-                    ...data
+                    statusId: statusId
                 }
             })
 

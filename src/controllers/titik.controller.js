@@ -3,9 +3,15 @@ const Titik = require('../models/Titik')
 const TitikController = {
     getAll: async (req, res) => {
         try {
-            const response = await Titik.getAll()
+            const nama = req.query.search || ''
+            const limit = parseInt(req.query.limit) || 10
+            const page = parseInt(req.query.page) || 1
+            const offset = req.query.offset || (page - 1) * limit
 
-            return res.status(200).json(response)
+            const response = await Titik.getAll(nama, limit, offset)
+            const total_data = await Titik.count()
+
+            return res.status(200).json({ total_data: total_data, data: response })
         } catch (error) {
             return res.status(500).json({ message: error.message })
         }
@@ -36,6 +42,18 @@ const TitikController = {
 
         try {
             const response = await Titik.update(id, nama_titik, latitude, longitude, radius)
+
+            return res.status(200).json(response)
+        } catch (error) {
+            return res.status(500).json({ message: error.message })
+        }
+    },
+
+    delete: async (req, res) => {
+        const { id } = req.params
+
+        try {
+            const response = await Titik.delete(id)
 
             return res.status(200).json(response)
         } catch (error) {

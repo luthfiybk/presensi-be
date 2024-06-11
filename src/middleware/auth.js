@@ -8,14 +8,14 @@ const auth = async (req, res, next) => {
     }
 
     try {
-        const decodedToken = jwt.verify(token.split(" ")[1], "secret_key");
+        const decodedToken = jwt.verify(token.split(" ")[1], process.env.SECRET_KEY);
 
         if (!decodedToken || !decodedToken.nip) {
             return res.status(401).json({ error: "Unauthorized - Invalid Token" });
         }
         
-        res.set("Authorization",  "Bearer " + token);
-        res.status(200).json({ message: "Authorized" });
+        
+        req.decodedToken = decodedToken;
         
         next();
     } catch (err) {

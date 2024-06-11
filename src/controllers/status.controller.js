@@ -3,7 +3,13 @@ const Status = require('../models/Status')
 const StatusController = {
     getAll: async (req, res) => {
         try {
-            const response = await Status.getAll()
+            const nama = req.query.search || ''
+            const group = req.query.group || ''
+            const limit = parseInt(req.query.limit) || 10
+            const page = parseInt(req.query.page) || 1
+            const offset = (page - 1) * limit
+            
+            const response = await Status.getAll(nama, group, limit, offset)
 
             return res.status(200).json(response)
         } catch (error) {

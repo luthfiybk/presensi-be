@@ -2,13 +2,30 @@ const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const Izin = {
-    getAll: async () => {
+    count: async () => {
         try {
-            const response = await prisma.$queryRaw`
+            const response = await prisma.izin.count()
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    getAll: async (nama, tanggal, statusId, divisiId, limit, offset) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
                 SELECT Izin.id, User.nip, User.nama, Izin.tanggal, Izin.statusId, Izin.keterangan, Status.nama_status as 'status' FROM Izin
                 LEFT JOIN User ON Izin.userId = User.nip
                 LEFT JOIN Status ON Izin.statusId = Status.id
-            `
+                WHERE
+                (User.nama LIKE CONCAT('%', ${nama}, '%') OR User.nama IS NULL)
+                AND (Izin.tanggal LIKE CONCAT('%', ${tanggal}, '%') OR Izin.tanggal IS NULL)
+                AND (Izin.statusId IS NULL OR Izin.statusId = ${statusId} OR ${statusId} IS NULL)
+                AND (User.divisiId = ${divisiId} OR ${divisiId} IS NULL)
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
 
             return response
         } catch (error) {

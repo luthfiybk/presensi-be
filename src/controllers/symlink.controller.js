@@ -7,7 +7,6 @@ const SymlinkController = {
         try {
             const filename = req.params.filename
             const filePath = path.join(__dirname, `../../public/uploads/${filename}`)
-            console.log(filePath)
 
             fs.exists(filePath, (exists) => {
                 if (exists) {

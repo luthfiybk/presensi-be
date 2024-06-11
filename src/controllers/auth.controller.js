@@ -34,8 +34,9 @@ const AuthController = {
                 { 
                     nip: user.nip,
                     roleId: user.roleId,
+                    divisiId: user.divisiId
                 }, 
-                "secret_key", 
+                process.env.SECRET_KEY, 
                 { 
                     algorithm: 'HS256',
                     allowInsecureKeySizes: true,
@@ -63,7 +64,7 @@ const AuthController = {
             return res.status(401).json({ error: "Unauthorized - Missing Token" });
         }
 
-        const decodedToken = jwt.verify(token.split(" ")[1], "secret_key");
+        const decodedToken = jwt.verify(token.split(" ")[1], process.env.SECRET_KEY);
 
         if (!decodedToken || !decodedToken.nip) {
             return res.status(401).json({ error: "Unauthorized - Invalid Token" });
@@ -82,6 +83,10 @@ const AuthController = {
         } catch (error) {
             res.status(500).json({ message: error.message })
         }
+    },
+
+    fetchData: async (req, res) => {
+        
     }
 }
 

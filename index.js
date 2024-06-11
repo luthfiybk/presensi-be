@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(cookieParser())
 app.use(session({
-    secret: 'secret_key',
+    secret: process.env.SECRET_KEY,
     resave: true,
     saveUninitialized: true,
     cookie: {
@@ -35,8 +35,6 @@ app.use('/public/uploads', express.static(path.join(__dirname, 'public/images'))
 app.use(liveReload())
 
 app.use('/api', routes)
-
-console.log(formatISO(new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }), { representation: 'basic' }))
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`)

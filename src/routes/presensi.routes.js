@@ -6,6 +6,5 @@ const auth = require('../middleware/auth')
 router.get('/', PresensiController.getAll)
 router.get('/:id', PresensiController.getById)
 router.post('/masuk', PresensiController.presensiMasuk)
-router.get('/check', PresensiController.getByDate)
 
 module.exports = router

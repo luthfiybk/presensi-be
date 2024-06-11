@@ -1,10 +1,27 @@
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const Divisi = {
-    getAll: async () => {
+    count: async () => {
         try {
-            const response = await prisma.divisi.findMany()
+            const response = await prisma.divisi.count()
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    getAll: async (nama, limit, offset) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
+                SELECT id, nama_divisi AS nama
+                FROM divisi
+                WHERE nama_divisi LIKE CONCAT('%', ${nama}, '%')
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
+
 
             return response
         } catch (error) {
@@ -36,6 +53,20 @@ const Divisi = {
                     nama_divisi: nama_divisi
                 }
             })
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    delete: async (id) => {
+        try {
+            const response = await prisma.divisi.delete({
+                where: {
+                    id: parseInt(id)
+                }
+            })
+
+            return response
         } catch (error) {
             throw new Error(error.message)
         }

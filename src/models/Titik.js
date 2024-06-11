@@ -1,11 +1,26 @@
-const { PrismaClient } = require('@prisma/client')
-const { update } = require('./User')
+const { PrismaClient, Prisma } = require('@prisma/client')
+const { update, count } = require('./User')
 const prisma = new PrismaClient()
 
 const Titik = {
-    getAll: async () => {
+    count: async () => {
         try {
-            const response = await prisma.titik.findMany()
+            const response = await prisma.titik.count()
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    getAll: async (nama, limit, offset) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
+                SELECT id, nama_titik as nama, latitude, longitude, radius FROM titik
+                WHERE nama_titik LIKE CONCAT('%', ${nama}, '%')
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
 
             return response
         } catch (error) {
@@ -38,6 +53,35 @@ const Titik = {
                     latitude: parseFloat(latitude),
                     longitude: parseFloat(longitude),
                     radius: parseInt(radius)
+                }
+            })
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    getNearest: async (lat, lng) => {
+        try {
+            const response = await prisma.$queryRaw`
+                SELECT id, radius, 
+                (6371 * acos(cos(radians(${lat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${lng})) + sin(radians(${lat})) * sin(radians(latitude)))) AS distance 
+                FROM Titik 
+                HAVING distance <= radius / 1000
+            `
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    delete: async (id) => {
+        try {
+            const response = await prisma.titik.delete({
+                where: {
+                    id: parseInt(id)
                 }
             })
 

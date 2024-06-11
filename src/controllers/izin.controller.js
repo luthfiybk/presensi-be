@@ -5,29 +5,27 @@ const {formatISO} = require('date-fns/formatISO')
 const IzinController = {
     getAll: async (req, res) => {
         try {
-            const response = await Izin.getAll()
+            const nama = req.query.search || ''
+            const date = req.query.date || ''
+            const statusId = req.query.status || null
+            const divisiId = req.query.division || null
+            const limit = req.query.limit || 10
+            const page = req.query.page || 1
+            const offset = req.query.offset || (page - 1) * limit
 
-            return res.status(200).json(response)
+            const response = await Izin.getAll(nama, date, statusId, divisiId, limit, offset)
+
+            const total_izin = await Izin.count()
+
+            return res.status(200).json({ total_data: total_izin, data: response })
         } catch (error) {
             return res.status(500).json({ message: error.message })
         }
     },
 
     applyIzin: async (req, res) => {
-        let token = req.headers.authorization;
-
-        if (!token || !token.startsWith("Bearer ")) {
-            return res.status(401).json({ error: "Unauthorized - Missing Token" });
-        }
-
-        const decodedToken = jwt.verify(token.split(" ")[1], "secret_key");
-
-        if (!decodedToken || !decodedToken.nip) {
-            return res.status(401).json({ error: "Unauthorized - Invalid Token" });
-        }
-
         try {
-            const userId = decodedToken.nip
+            const userId = req. decodedToken.nip
             const statusId = 4
             const keterangan = req.body.keterangan
             const file = req.file
@@ -62,21 +60,8 @@ const IzinController = {
     },
 
     approveIzin: async (req, res) => {
-        let token = req.headers.authorization;
-        console.log(token)
-
-        if (!token || !token.startsWith("Bearer ")) {
-            return res.status(401).json({ error: "Unauthorized - Missing Token" });
-        }
-
-        const decodedToken = jwt.verify(token.split(" ")[1], "secret_key");
-
-        if (!decodedToken || !decodedToken.nip) {
-            return res.status(401).json({ error: "Unauthorized - Invalid Token" });
-        }
-
         try {
-            if (decodedToken.roleId === 3 || decodedToken.roleId === 1) {
+            if (req.decodedToken.roleId === 3 || req.decodedToken.roleId === 1) {
                 const izinId = req.params.id
                 const statusId = 5
     
@@ -92,20 +77,9 @@ const IzinController = {
     },
 
     rejectIzin: async (req, res) => {
-        let token = req.headers.authorization;
-
-        if (!token || !token.startsWith("Bearer ")) {
-            return res.status(401).json({ error: "Unauthorized - Missing Token" });
-        }
-
-        const decodedToken = jwt.verify(token.split(" ")[1], "secret_key");
-
-        if (!decodedToken || !decodedToken.nip) {
-            return res.status(401).json({ error: "Unauthorized - Invalid Token" });
-        }
 
         try {
-            if(decodedToken.roleId === 3 || decodedToken.roleId === 1) {
+            if(req.decodedToken.roleId === 3 || req.decodedToken.roleId === 1) {
                 const izinId = req.params.id
                 const statusId = 6
     
@@ -120,6 +94,19 @@ const IzinController = {
             return res.status(500).json({ message: error.message })
         }
     },
+
+    updateIzin: async (req, res) => {
+        try {
+            const izinId = req.params.id
+            const statusId = req.body.statusId
+
+            const response = await Izin.updateIzin(izinId, statusId)
+
+            return res.status(200).json(response)
+        } catch (error) {
+            return res.status(500).json({ message: error.message })
+        }
+    }
 }
 
 module.exports = IzinController

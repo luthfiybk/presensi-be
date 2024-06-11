@@ -1,14 +1,18 @@
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const Supervisor = {
-    dashboard: async (divisiId) => {
+    dashboard: async (divisiId, tanggal) => {
         try {
-            const response = await prisma.$queryRaw`
-                SELECT 'Jumlah Karyawan' as kolom, CAST(count(*) as CHAR) as total FROM User WHERE roleId = 2 AND divisiId = ${divisiId} UNION ALL
-                SELECT 'Jumlah Karyawan yang Presensi' as kolom, CAST(count(*) as CHAR) as total FROM Presensi UNION ALL
-                SELECT 'Jumlah Karyawan yang Izin' as kolom, CAST(count(*) as CHAR) as total FROM Izin
-            `
+            const response = await prisma.$queryRaw(Prisma.sql`
+                SELECT 'Jumlah Karyawan' as kolom, CAST(count(*) as CHAR) as total FROM User WHERE roleId = 2 AND divisiId = ${divisiId} 
+                UNION ALL
+                SELECT 'Jumlah Karyawan yang Presensi Hari Ini' as kolom, CAST(count(*) as CHAR) as total FROM Presensi
+                LEFT JOIN User ON Presensi.userId = User.nip WHERE tanggal LIKE CONCAT('%', ${tanggal}, '%') AND User.divisiId = ${divisiId}
+                UNION ALL
+                SELECT 'Jumlah Karyawan yang Izin Hari Ini' as kolom, CAST(count(*) as CHAR) as total FROM Izin
+                LEFT JOIN User ON Izin.userId = User.nip WHERE tanggal LIKE CONCAT('%', ${tanggal}, '%') AND User.divisiId = ${divisiId}
+            `)
 
             return response
         } catch (error) {
@@ -16,14 +20,17 @@ const Supervisor = {
         }
     },
 
-    getKaryawan: async (divisiId) => {
+    getKaryawan: async (divisiId, nama, limit, offset) => {
         try {
-            const response = prisma.$queryRaw`
+            const response = prisma.$queryRaw(Prisma.sql`
                 SELECT User.nip, User.nama, Divisi.nama_divisi as 'divisi', User.email FROM User
                 LEFT JOIN Divisi ON User.divisiId = Divisi.id
                 LEFT JOIN Role ON User.roleId = Role.id
                 WHERE User.divisiId = ${divisiId} AND User.roleId = 2
-            `
+                AND (User.nama LIKE CONCAT('%', ${nama}, '%') OR ${nama} IS NULL)
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
 
             return response
         } catch (error) {
@@ -31,14 +38,20 @@ const Supervisor = {
         }
     },
 
-    getIzin: async (divisiId) => {
+    getIzin: async (divisiId, nama, tanggal, statusId, limit, offset) => {
         try {
-            const response = await prisma.$queryRaw`
+            const response = await prisma.$queryRaw(Prisma.sql`
                 SELECT Izin.id, User.nip, User.nama, Izin.statusId, Izin.keterangan, Status.nama_status as 'status', Izin.tanggal FROM Izin
                 LEFT JOIN User ON User.nip = Izin.userId
                 LEFT JOIN Status ON Status.id = Izin.statusId
                 WHERE User.divisiId = ${divisiId}
-            `
+                AND
+                (User.nama LIKE CONCAT('%', ${nama}, '%') OR User.nama IS NULL)
+                AND (Izin.tanggal LIKE CONCAT('%', ${tanggal}, '%') OR Izin.tanggal IS NULL)
+                AND (Izin.statusId IS NULL OR Izin.statusId = ${statusId} OR ${statusId} IS NULL)
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
 
             return response
         } catch (error) {
@@ -46,14 +59,19 @@ const Supervisor = {
         }
     },
 
-    getPresensi: async (divisiId) => {
+    getPresensi: async (divisiId, nama, tanggal, statusId, limit, offset) => {
         try {
-            const response = await prisma.$queryRaw`
+            const response = await prisma.$queryRaw(Prisma.sql`
                 SELECT Presensi.id, User.nip, User.nama, Presensi.tanggal, Presensi.jamMasuk, Status.nama_status as 'status', Presensi.statusId FROM Presensi
-                LEFT JOIN User ON User.nip = Presensi.userId
-                LEFT JOIN Status ON Status.id = Presensi.statusId
+                LEFT JOIN User ON Presensi.userId = User.nip
+                LEFT JOIN Status ON Presensi.statusId = Status.id
                 WHERE User.divisiId = ${divisiId}
-            `
+                AND (User.nama LIKE CONCAT('%', ${nama}, '%') OR ${nama} IS NULL)
+                AND (Presensi.tanggal LIKE CONCAT('%', ${tanggal}, '%') OR ${tanggal} IS NULL)
+                AND (Presensi.statusId IS NULL OR Presensi.statusId = ${statusId} OR ${statusId} IS NULL)
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
 
             return response
         } catch (error) {

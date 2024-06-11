@@ -5,5 +5,6 @@ const TitikController = require('../controllers/titik.controller')
 router.get('/', TitikController.getAll)
 router.post('/', TitikController.add)
 router.patch('/:id', TitikController.update)
+router.delete('/:id', TitikController.delete)
 
 module.exports = router

@@ -2,13 +2,29 @@ const { PrismaClient, Prisma } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 const User = {
-    getAll: async () => {
+    count: async () => {
         try {
-            const response = await prisma.$queryRaw`
+            const response = await prisma.user.count()
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    getAll: async (nama, limit, offset, roleId, divisiId) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
                 SELECT User.nama, User.nip, Role.nama_role as 'role', Divisi.nama_divisi as 'divisi', User.email as 'email' FROM User
                 LEFT JOIN Role ON User.roleId = Role.id
                 LEFT JOIN Divisi ON User.divisiId = Divisi.id
-            `
+                WHERE
+                (User.nama LIKE CONCAT('%', ${nama}, '%') OR User.nama IS NULL)
+                AND (User.roleId IS NULL OR User.roleId = ${roleId} OR ${roleId} IS NULL)
+                AND (User.divisiId = ${divisiId} OR ${divisiId} IS NULL)
+                LIMIT ${limit}
+                OFFSET ${offset}
+            `)
 
             return response
         } catch (error) {
@@ -47,11 +63,16 @@ const User = {
         }
     },
 
-    create: async (data) => {
+    create: async (nip, nama, email, password, roleId, divisiId) => {
         try {
             const response = await prisma.user.create({
                 data: {
-                    ...data
+                    nip: nip,
+                    nama: nama,
+                    email: email,
+                    password: password,
+                    roleId: roleId,
+                    divisiId: divisiId
                 }
             })
 
@@ -61,11 +82,11 @@ const User = {
         }
     },
 
-    update: async (id, data) => {
+    update: async (nip, data) => {
         try {
             const response = await prisma.user.update({
                 where: {
-                    id: parseInt(id)
+                    nip: nip
                 },
                 data: {
                     ...data
@@ -78,11 +99,11 @@ const User = {
         }
     },
 
-    delete: async (id) => {
+    delete: async (nip) => {
         try {
             const response = await prisma.user.delete({
                 where: {
-                    id: parseInt(id)
+                    nip: nip
                 }
             })
 

@@ -66,6 +66,8 @@ const PresensiController = {
             const latitude = parseFloat(req.body.latitude)
             const longitude = parseFloat(req.body.longitude)
             const jam = moment.tz('Asia/Jakarta').format('HH')
+            const menit = moment.tz('Asia/Jakarta').format('mm')
+            const detik = moment.tz('Asia/Jakarta').format('ss')
 
             const near_titik = await Titik.getNearest(latitude, longitude)
 

@@ -20,6 +20,20 @@ const Supervisor = {
         }
     },
 
+    countKaryawan: async (divisiId, nama) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
+                SELECT count(*) as total_data FROM User
+                WHERE divisiId = ${divisiId} AND roleId = 2
+                AND (nama LIKE CONCAT('%', ${nama}, '%') OR ${nama} IS NULL)
+            `)
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
     getKaryawan: async (divisiId, nama, limit, offset) => {
         try {
             const response = prisma.$queryRaw(Prisma.sql`
@@ -30,6 +44,38 @@ const Supervisor = {
                 AND (User.nama LIKE CONCAT('%', ${nama}, '%') OR ${nama} IS NULL)
                 LIMIT ${limit}
                 OFFSET ${offset}
+            `)
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    countIzin: async (divisiId, nama, tanggal, statusId) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
+                SELECT count(*) as total_data FROM Izin
+                LEFT JOIN User ON User.nip = Izin.userId
+                WHERE User.divisiId = ${divisiId}
+                
+            `)
+
+            return response
+        } catch (error) {
+            throw new Error(error.message)
+        }
+    },
+
+    countPresensi: async (divisiId, nama, tanggal, statusId) => {
+        try {
+            const response = await prisma.$queryRaw(Prisma.sql`
+                SELECT count(*) as total_data FROM Presensi
+                LEFT JOIN User ON User.nip = Presensi.userId
+                WHERE User.divisiId = ${divisiId}
+                AND (User.nama LIKE CONCAT('%', ${nama}, '%') OR ${nama} IS NULL)
+                AND (Presensi.tanggal LIKE CONCAT('%', ${tanggal}, '%') OR ${tanggal} IS NULL)
+                AND (Presensi.statusId IS NULL OR Presensi.statusId = ${statusId} OR ${statusId} IS NULL)
             `)
 
             return response

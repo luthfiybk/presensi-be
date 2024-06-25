@@ -21,11 +21,12 @@ const SupervisorController = {
             const nama = req.query.search || ''
             const limit = Number(req.query.limit) || 10
             const page = Number(req.query.page) || 1
-            const offset = (page - 1) * limit
+            const offset = req.query.offset || (page - 1) * limit
 
             const response = await Supervisor.getKaryawan(divisiId, nama, limit, offset)
+            const total_data = await Supervisor.countKaryawan(divisiId, nama)
 
-            return res.status(200).json(response)
+            return res.status(200).json({ total_data: parseInt(total_data[0].total_data), data: response })
         } catch (error) {
             return res.status(500).json({ error: error.message })
         }
@@ -40,11 +41,12 @@ const SupervisorController = {
             const statusId = req.query.status || null
             const limit = Number(req.query.limit) || 10
             const page = Number(req.query.page) || 1
-            const offset = (page - 1) * limit
+            const offset = req.query.offset || (page - 1) * limit
 
             const response = await Supervisor.getIzin(divisiId, nama, tanggal, statusId, limit, offset)
+            const total_data = await Supervisor.countIzin(divisiId, nama, tanggal, statusId)
 
-            return res.status(200).json(response)
+            return res.status(200).json({ total_data: parseInt(total_data[0].total_data), data: response })
         } catch (error) {
             return res.status(500).json({ error: error.message })
         }
@@ -59,7 +61,7 @@ const SupervisorController = {
             const date = req.query.date || ''
             const limit = Number(req.query.limit) || 10
             const page = Number(req.query.page) || 1
-            const offset = (page - 1) * limit
+            const offset = req.query.offset || (page - 1) * limit
 
             const response = await Supervisor.getPresensi(divisiId, nama, date, status, limit, offset)
             const mappedResponse = response.map((item) => {
@@ -70,9 +72,9 @@ const SupervisorController = {
                 }
             })
 
-            console.log(mappedResponse)
+            const total_data = await Supervisor.countPresensi(divisiId, nama, date, status)
 
-            return res.status(200).json(mappedResponse)
+            return res.status(200).json({ total_data: parseInt(total_data[0].total_data), data: mappedResponse })
         } catch (error) {
             return res.status(500).json({ error: error.message })
         }

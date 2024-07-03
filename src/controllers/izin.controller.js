@@ -77,7 +77,6 @@ const IzinController = {
     },
 
     rejectIzin: async (req, res) => {
-
         try {
             if(req.decodedToken.roleId === 3 || req.decodedToken.roleId === 1) {
                 const izinId = req.params.id

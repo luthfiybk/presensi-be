@@ -9,6 +9,6 @@ router.get('/:userId', UserController.getByNIP)
 router.post('/create', UserController.create)
 router.put('/:nip', UserController.update)
 router.delete('/:nip', UserController.delete)
-router.get('/presensi/check', auth, PresensiController.check)
+router.get('/presensi/check', auth.isAuth, PresensiController.check)
 
 module.exports = router

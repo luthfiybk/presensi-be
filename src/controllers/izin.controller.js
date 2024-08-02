@@ -25,7 +25,7 @@ const IzinController = {
 
     applyIzin: async (req, res) => {
         try {
-            const userId = req. decodedToken.nip
+            const userId = req.decodedToken.nip
             const statusId = 4
             const keterangan = req.body.keterangan
             const file = req.file

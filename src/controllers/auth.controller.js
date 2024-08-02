@@ -86,7 +86,27 @@ const AuthController = {
     },
 
     fetchData: async (req, res) => {
-        
+        try {
+            const token = req.headers.authorization
+            const decodedToken = jwt.verify(token.split(" ")[1], process.env.SECRET_KEY)
+
+            if (!decodedToken || !decodedToken.nip) {
+                return res.status(401).json({ error: "Unauthorized - Invalid Token" });
+            }
+
+            const user = await User.getByNIP(decodedToken.nip)
+            const response = {
+                nip: user[0].nip,
+                nama: user[0].nama,
+                email: user[0].email,
+                divisiId: user[0].divisiId,
+                roleId: user[0].roleId
+            }
+
+            res.status(200).json(response)
+        } catch (error) {
+            res.status(500).json({ message: error.message })
+        }
     }
 }
 

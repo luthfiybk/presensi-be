@@ -30,6 +30,7 @@ app.use(session({
         sameSite: 'strict',
     }
 }))
+
 app.use('/public/uploads', express.static(path.join(__dirname, 'public/images')));
 
 app.use(liveReload())

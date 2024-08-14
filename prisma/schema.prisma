@@ -27,7 +27,6 @@ model User {
   updatedAt   DateTime @updatedAt
   presensi    Presensi[]
   izin        Izin[]
-  logActivity LogActivity[]
 }
 
 model Role {
@@ -91,14 +90,4 @@ model Status {
   updatedAt        DateTime @updatedAt
   izin             Izin[]
   presensi         Presensi[]
-}
-
-model LogActivity {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [nip])
-  activity  String
-  time      DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

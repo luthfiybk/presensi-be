@@ -101,13 +101,25 @@ const User = {
 
     delete: async (nip) => {
         try {
-            const response = await prisma.user.delete({
+            const izinDelete = await prisma.izin.deleteMany({
                 where: {
-                    nip: nip
+                    userId: nip
                 }
             })
 
-            return response
+            const presensiDelete = await prisma.presensi.deleteMany({
+                where: {
+                    userId: nip
+                }
+            })
+
+            const userDelete = prisma.user.delete({
+                where: {
+                    nip: nip,
+                }
+            })
+
+            return userDelete
         } catch (error) {
             throw new Error(error.message)
         }

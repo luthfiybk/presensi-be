@@ -25,6 +25,7 @@ const Presensi = {
                 AND (Presensi.tanggal LIKE CONCAT('%', ${tanggal}, '%') OR Presensi.tanggal IS NULL)
                 AND (Presensi.statusId IS NULL OR Presensi.statusId = ${statusId} OR ${statusId} IS NULL)
                 AND (User.divisiId = ${divisiId} OR ${divisiId} IS NULL)
+                ORDER BY Presensi.tanggal DESC
                 LIMIT ${limit}
                 OFFSET ${offset}
             `)

@@ -23,6 +23,7 @@ const Izin = {
                 AND (Izin.tanggal LIKE CONCAT('%', ${tanggal}, '%') OR Izin.tanggal IS NULL)
                 AND (Izin.statusId IS NULL OR Izin.statusId = ${statusId} OR ${statusId} IS NULL)
                 AND (User.divisiId = ${divisiId} OR ${divisiId} IS NULL)
+                ORDER BY Izin.tanggal DESC
                 LIMIT ${limit}
                 OFFSET ${offset}
             `)

@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 const auth = require('../middleware/auth')
 
-router.get('/', UserController.getAll)
+router.get('/', auth.isAuth, UserController.getAll)
 router.get('/:userId', UserController.getByNIP)
 router.post('/create', UserController.create)
 router.put('/:nip', UserController.update)
